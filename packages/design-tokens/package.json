@@ -1,0 +1,11 @@
+{
+  "name": "@healthtribe/design-tokens",
+  "private": true,
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}

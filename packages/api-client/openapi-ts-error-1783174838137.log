@@ -1,0 +1,16 @@
+[2026-07-04T14:20:38.137Z] Error: Error parsing c:/Users/ROHIT/Downloads/Healthtribe%20project/backend/openapi.json: null byte is not allowed in input (1:4)
+
+ 1 | ��{
+--------^
+ 2 | "
+ 3 | o
+Stack:
+ParserError: Error parsing c:/Users/ROHIT/Downloads/Healthtribe%20project/backend/openapi.json: null byte is not allowed in input (1:4)
+
+ 1 | ��{
+--------^
+ 2 | "
+ 3 | o
+    at Object.handler (file:///C:/Users/ROHIT/AppData/Local/pnpm-cache/dlx/65ffcaadca7709c3102f93bd9eb84d42f2490764cbb17ebe4fcf9efb4003f8c5/19f2d80932f-1d84/node_modules/.pnpm/@hey-api+json-schema-ref-parser@1.4.4/node_modules/@hey-api/json-schema-ref-parser/dist/index.mjs:1145:10)
+    at runNextPlugin (file:///C:/Users/ROHIT/AppData/Local/pnpm-cache/dlx/65ffcaadca7709c3102f93bd9eb84d42f2490764cbb17ebe4fcf9efb4003f8c5/19f2d80932f-1d84/node_modules/.pnpm/@hey-api+json-schema-ref-parser@1.4.4/node_modules/@hey-api/json-schema-ref-parser/dist/index.mjs:1209:33)
+    at runNextPlugin (file:///C:/Users/ROHIT/AppData/Local/pnpm-cache/dlx/65ffcaadca7709c3102f93bd9eb84d42f2490764cbb17ebe4fcf9efb4003f8c5/19f2d80932f-1d84/node_modules/.pnpm/@hey-api+json-schema-ref-parser@1.4.4/node_modules/@hey-api/json-schema-ref-parser/dist/index.mjs:1220:5)

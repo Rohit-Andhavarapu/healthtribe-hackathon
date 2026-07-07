@@ -1,0 +1,11 @@
+{
+  "name": "@healthtribe/schemas",
+  "private": true,
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  }
+}
