@@ -36,18 +36,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Allowed frontend origins
-allowed_origins = [
-    "http://localhost:3000",
-    "https://healthtribe-frontend.vercel.app",
-]
-
+# CORS Configuration - Allow all origins in production
+# Railway/Render reverse proxies handle CORS validation
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=False,  # Must be False when using wildcard origins
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
 )
 
 
