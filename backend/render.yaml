@@ -31,13 +31,6 @@ services:
           name: healthtribe-db
           property: port
       
-      # Redis - Link to redis service below
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: healthtribe-redis
-          property: connectionString
-      
       # Clerk Authentication - SET THESE MANUALLY
       - key: CLERK_SECRET_KEY
         sync: false
@@ -72,11 +65,4 @@ databases:
     databaseName: healthtribe_db
     region: oregon
     plan: starter
-    ipAllowList: []
-
-  # Redis Cache
-  - name: healthtribe-redis
-    region: oregon
-    plan: starter
-    maxmemoryPolicy: allkeys-lru
     ipAllowList: []

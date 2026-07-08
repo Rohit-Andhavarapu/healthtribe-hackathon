@@ -16,8 +16,8 @@ class Settings(BaseSettings):
     def DATABASE_URL(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         
-    # Redis - REQUIRED
-    REDIS_URL: str
+    # Redis - OPTIONAL (not used yet, safe to leave empty)
+    REDIS_URL: str = ""
     
     # Clerk Authentication - REQUIRED
     CLERK_SECRET_KEY: str
