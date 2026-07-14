@@ -25,7 +25,10 @@ class AuthService:
         # Try to claim the seeded demo user
         demo_user = await self.get_demo_user()
         if demo_user:
+            from app.infrastructure.database.models import RoleEnum
+            
             demo_user.clerk_user_id = clerk_user_id
+            demo_user.role = RoleEnum(role) if isinstance(role, str) else role  # Update role from JWT
             await self.db.commit()
             await self.db.refresh(demo_user)
             return demo_user
