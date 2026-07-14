@@ -14,9 +14,6 @@ export function RoleSwitcher() {
   const [isSwitching, setIsSwitching] = useState(false);
 
   if (isLoading) return null;
-
-  // Temporarily disabled for production readiness
-  return null;
   
   const role = data?.role;
   const isDoctor = role === 'DOCTOR';
