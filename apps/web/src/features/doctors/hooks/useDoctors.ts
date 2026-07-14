@@ -11,7 +11,7 @@ export function useDoctors(specialty?: string) {
         throw new Error(String(response.error));
       }
       
-      let doctors = response.data || [];
+      let doctors = Array.isArray(response) ? response : (response?.data || []);
       
       if (specialty && specialty !== "General") {
         doctors = doctors.filter((d: DoctorResponse) => d.specialty === specialty);
