@@ -25,6 +25,16 @@ settings = get_settings()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    # TEMPORARY production seeding: only seed an empty database on first boot.
+    async with engine.connect() as connection:
+        result = await connection.exec_driver_sql("SELECT COUNT(*) FROM hospitals")
+        hospital_count = result.scalar_one()
+
+    if hospital_count == 0:
+        from scripts.seed_db_phase1 import seed as seed_phase1
+
+        await seed_phase1()
+
     yield
     # Shutdown
     await engine.dispose()
