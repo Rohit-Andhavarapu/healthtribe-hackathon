@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { useHospitals } from "../../hospitals/hooks/useHospitals";
 
 export function ABHAUI({ patientId }: { patientId: string }) {
   const [step, setStep] = useState<"link" | "otp" | "linked" | "import">("link");
@@ -8,8 +10,10 @@ export function ABHAUI({ patientId }: { patientId: string }) {
   const [otp, setOtp] = useState("");
   const [generatedOtp, setGeneratedOtp] = useState("");
   
-  const [importState, setImportState] = useState<"idle" | "connecting" | "authenticating" | "consent" | "fhir" | "converting" | "timeline" | "ai" | "complete">("idle");
+  const [importState, setImportState] = useState<"idle" | "connecting" | "authenticating" | "consent" | "fhir" | "converting" | "timeline" | "ai" | "complete" | "error">("idle");
   const [selectedHospital, setSelectedHospital] = useState("");
+  const { getToken } = useAuth();
+  const { data: hospitals = [], isLoading: loadingHospitals } = useHospitals();
 
   const handleGenerateOtp = () => {
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -19,13 +23,22 @@ export function ABHAUI({ patientId }: { patientId: string }) {
 
   const handleVerifyOtp = async () => {
     if (otp === generatedOtp) {
-      // Mock API Call
-      await fetch(`/api/v1/abha/link/${patientId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ abha_number: abhaNumber, abha_address: "rohit@abdm" })
-      });
-      setStep("linked");
+      try {
+        const token = await getToken();
+        const res = await fetch(`/api/v1/abha/link/${patientId}`, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ abha_number: abhaNumber, abha_address: "rohit@abdm" })
+        });
+        if (!res.ok) throw new Error("Failed to link ABHA");
+        setStep("linked");
+      } catch (e) {
+        console.error(e);
+        alert("Error linking ABHA");
+      }
     } else {
       alert("Invalid OTP");
     }
@@ -43,20 +56,31 @@ export function ABHAUI({ patientId }: { patientId: string }) {
     
     // API call
     try {
-      await fetch(`/api/v1/abha/import/${patientId}`, {
+      const token = await getToken();
+      const res = await fetch(`/api/v1/abha/import/${patientId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ hospital_id: hospitalId })
       });
-    } catch(e) { console.error(e) }
-    
-    setImportState("converting");
-    await new Promise(r => setTimeout(r, 800));
-    setImportState("timeline");
-    await new Promise(r => setTimeout(r, 800));
-    setImportState("ai");
-    await new Promise(r => setTimeout(r, 800));
-    setImportState("complete");
+      
+      if (!res.ok) {
+        throw new Error(`API Error: ${res.status}`);
+      }
+      
+      setImportState("converting");
+      await new Promise(r => setTimeout(r, 800));
+      setImportState("timeline");
+      await new Promise(r => setTimeout(r, 800));
+      setImportState("ai");
+      await new Promise(r => setTimeout(r, 800));
+      setImportState("complete");
+    } catch(e) {
+      console.error(e);
+      setImportState("error");
+    }
   };
 
   return (
@@ -111,22 +135,26 @@ export function ABHAUI({ patientId }: { patientId: string }) {
           </div>
           
           <h3 className="text-lg font-semibold border-b pb-2">Available Health Records</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {["Apollo Hospitals", "Yashoda Hospitals", "CARE Hospitals"].map((h) => (
-              <div key={h} className="border p-4 rounded-lg flex justify-between items-center hover:border-blue-300 transition">
-                <div>
-                  <div className="font-medium text-gray-800">{h}</div>
-                  <div className="text-sm text-gray-500">Multiple Records Found</div>
+          {loadingHospitals ? (
+            <div className="text-gray-500 py-4 text-center">Loading hospitals...</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {hospitals.map((h) => (
+                <div key={h.id} className="border p-4 rounded-lg flex justify-between items-center hover:border-blue-300 transition">
+                  <div>
+                    <div className="font-medium text-gray-800">{h.name}</div>
+                    <div className="text-sm text-gray-500">{h.location || "Multiple Records Found"}</div>
+                  </div>
+                  <button 
+                    onClick={() => startImport(h.id, h.name)}
+                    className="text-blue-600 font-medium hover:underline text-sm"
+                  >
+                    Import
+                  </button>
                 </div>
-                <button 
-                  onClick={() => startImport(crypto.randomUUID(), h)}
-                  className="text-blue-600 font-medium hover:underline text-sm"
-                >
-                  Import
-                </button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
       
@@ -170,6 +198,11 @@ export function ABHAUI({ patientId }: { patientId: string }) {
             {importState === "complete" && (
               <li className="text-green-700 font-bold mt-4 pt-4 border-t">
                  🎉 Import Complete! View your Timeline.
+              </li>
+            )}
+            {importState === "error" && (
+              <li className="text-red-600 font-bold mt-4 pt-4 border-t">
+                 ❌ Import Failed. Could not connect to hospital servers.
               </li>
             )}
           </ul>

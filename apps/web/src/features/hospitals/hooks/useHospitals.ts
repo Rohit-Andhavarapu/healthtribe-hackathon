@@ -14,7 +14,8 @@ export function useHospitals() {
     queryFn: async () => {
       const response = await getAllApiV1HospitalsGet();
       if (response.error) throw new Error(String(response.error));
-      return response.data as unknown as Hospital[];
+      let hospitals = Array.isArray(response) ? response : (response?.data || []);
+      return hospitals as unknown as Hospital[];
     }
   });
 }
