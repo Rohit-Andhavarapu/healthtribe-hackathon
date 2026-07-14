@@ -11,8 +11,8 @@ export function useAppointments() {
       if (response.error) {
         throw new Error(String(response.error));
       }
-      
-      return response.data || [];
+      let appointments = Array.isArray(response) ? response : (response?.data || []);
+      return appointments;
     }
   });
 }
